@@ -111,9 +111,18 @@ def get_llm_model(provider: str, **kwargs):
         else:
             base_url = kwargs.get("base_url")
 
+        # For DeepSeek models within Ollama
         if "deepseek-r1" in kwargs.get("model_name", "qwen2.5:7b"):
             return DeepSeekR1ChatOllama(
                 model=kwargs.get("model_name", "deepseek-r1:14b"),
+                temperature=kwargs.get("temperature", 0.0),
+                num_ctx=kwargs.get("num_ctx", 32000),
+                base_url=base_url,
+            )
+        # For Gemma models
+        elif kwargs.get("model_name", "qwen2.5:7b") in ["gemma3:27b", "gemma3-enhanced:12b"]:
+            return ChatOllama(
+                model=kwargs.get("model_name"),
                 temperature=kwargs.get("temperature", 0.0),
                 num_ctx=kwargs.get("num_ctx", 32000),
                 base_url=base_url,
@@ -170,8 +179,12 @@ model_names = {
     "deepseek": ["deepseek-chat", "deepseek-reasoner"],
     "google": ["gemini-2.0-flash", "gemini-2.0-flash-thinking-exp", "gemini-1.5-flash-latest",
                "gemini-1.5-flash-8b-latest", "gemini-2.0-flash-thinking-exp-01-21", "gemini-2.0-pro-exp-02-05"],
-    "ollama": ["qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b", "qwen2.5-coder:14b", "qwen2.5-coder:32b", "llama2:7b",
-               "deepseek-r1:14b", "deepseek-r1:32b"],
+    "ollama": [
+        "qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b",
+        "qwen2.5-coder:14b", "qwen2.5-coder:32b",
+        "llama2:7b", "deepseek-r1:14b", "deepseek-r1:32b",
+        "gemma3:27b", "gemma3-enhanced:12b"   # <-- Added Gemma models
+    ],
     "azure_openai": ["gpt-4o", "gpt-4", "gpt-3.5-turbo"],
     "mistral": ["mixtral-large-latest", "mistral-large-latest", "mistral-small-latest", "ministral-8b-latest"],
     "alibaba": ["qwen-plus", "qwen-max", "qwen-turbo", "qwen-long"],
